@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using watch_assets.Data;
 using watch_assets.Models;
+using watch_assets.Services;
 
 namespace watch_assets.Controllers
 {
@@ -10,15 +11,28 @@ namespace watch_assets.Controllers
     public class AssetSearchController : ControllerBase
     {
         private readonly WatchAssetsContext _context;
+        private readonly IAzureService _azureService;
+        private readonly ILogger<AssetSearchController> _logger;
 
-        public AssetSearchController(WatchAssetsContext context)
+        public AssetSearchController(WatchAssetsContext context, IAzureService azureService, ILogger<AssetSearchController> logger)
         {
             _context = context;
+            _azureService = azureService;
+            _logger = logger;
         }
 
         [HttpPost("search")]
         public async Task<ActionResult<IEnumerable<Asset>>> SearchAssets([FromBody] AssetSearch searchParams)
         {
+            // Log search query to Azure for analytics
+            var searchLog = new { 
+                Query = searchParams.Query, 
+                Location = searchParams.Location, 
+                Status = searchParams.Status, 
+                Timestamp = DateTime.UtcNow 
+            };
+            await _azureService.StoreAssetDataAsync($"search-{Guid.NewGuid()}", searchLog);
+
             var query = _context.Assets.AsQueryable();
 
             if (!string.IsNullOrEmpty(searchParams.Query))
@@ -73,6 +87,9 @@ namespace watch_assets.Controllers
                 MaintenanceAssets = maintenanceAssets,
                 AverageHealthScore = Math.Round(avgHealthScore ?? 0, 2)
             };
+
+            // Store analytics to Azure
+            await _azureService.StoreAssetDataAsync($"analytics-{DateTime.UtcNow:yyyy-MM-dd}", summary);
 
             return Ok(summary);
         }

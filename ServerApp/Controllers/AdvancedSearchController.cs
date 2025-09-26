@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using watch_assets.Data;
 using watch_assets.Models;
+using watch_assets.Services;
 
 namespace watch_assets.Controllers
 {
@@ -11,17 +12,28 @@ namespace watch_assets.Controllers
     public class AdvancedSearchController : ControllerBase
     {
         private readonly WatchAssetsContext _context;
+        private readonly IAzureService _azureService;
+        private readonly ILogger<AdvancedSearchController> _logger;
 
-        public AdvancedSearchController(WatchAssetsContext context)
+        public AdvancedSearchController(WatchAssetsContext context, IAzureService azureService, ILogger<AdvancedSearchController> logger)
         {
             _context = context;
+            _azureService = azureService;
+            _logger = logger;
         }
 
         [HttpPost("semantic-search")]
         public async Task<ActionResult<IEnumerable<Asset>>> SemanticSearch([FromBody] AssetSearch searchParams)
         {
-            // TODO: Replace with actual ML model for semantic search
-            // For now using basic keyword matching with scoring
+            // Log the semantic search for analytics
+            var searchAnalytics = new
+            {
+                SearchParams = searchParams,
+                SearchType = "Semantic",
+                Timestamp = DateTime.UtcNow
+            };
+            await _azureService.StoreAssetDataAsync($"semantic-search-{Guid.NewGuid()}", searchAnalytics);
+
             var assets = await _context.Assets.ToListAsync();
             
             var scoredAssets = assets
@@ -30,11 +42,10 @@ namespace watch_assets.Controllers
                     Asset = asset,
                     Score = CalculateRelevanceScore(asset, searchParams)
                 })
-                .Where(x => x.Score > 0.3) // Threshold for relevance - might need tuning based on data
+                .Where(x => x.Score > 0.3) // Threshold for relevance
                 .OrderByDescending(x => x.Score)
                 .Select(x => x.Asset);
 
-            // Note: In production, we'd want to cache these results for performance
             return Ok(scoredAssets);
         }
 

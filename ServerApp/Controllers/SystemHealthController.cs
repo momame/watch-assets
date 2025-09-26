@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using watch_assets.Data;
+using watch_assets.Services;
 
 namespace watch_assets.Controllers
 {
@@ -8,10 +10,14 @@ namespace watch_assets.Controllers
     public class SystemHealthController : ControllerBase
     {
         private readonly WatchAssetsContext _context;
+        private readonly IAzureService _azureService;
+        private readonly ILogger<SystemHealthController> _logger;
 
-        public SystemHealthController(WatchAssetsContext context)
+        public SystemHealthController(WatchAssetsContext context, IAzureService azureService, ILogger<SystemHealthController> logger)
         {
             _context = context;
+            _azureService = azureService;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -50,6 +56,9 @@ namespace watch_assets.Controllers
                     Throughput = "Normal"
                 }
             };
+
+            // Store health report to Azure for monitoring
+            await _azureService.StoreAssetDataAsync($"health-{DateTime.UtcNow:yyyy-MM-dd-HH-mm}", healthReport);
 
             var statusCode = apiStatus == "Healthy" ? 200 : 503;
             return StatusCode(statusCode, healthReport);
