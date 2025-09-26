@@ -54,6 +54,8 @@ namespace watch_assets.Controllers
         [HttpPost]
         public async Task<ActionResult<Asset>> PostAsset(Asset asset)
         {
+            // TODO: Implement service layer to separate business logic from controller
+            // Current implementation directly accesses DbContext
             _context.Assets.Add(asset);
             await _context.SaveChangesAsync();
 

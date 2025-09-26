@@ -46,3 +46,15 @@ This system demonstrates enterprise-scale distributed system design with:
 - Test-driven development practices
 - Containerization and deployment strategies
 - Real-time monitoring capabilities
+
+## Known Issues
+- Search performance degrades with large datasets
+- Direct database access in controllers - needs service layer abstraction
+- Need to add proper error handling
+- Missing comprehensive unit tests
+
+## Next Steps
+- Add caching layer
+- Implement proper logging configuration  
+- Add unit tests for all controllers
+- Implement service layer for better separation of concerns
