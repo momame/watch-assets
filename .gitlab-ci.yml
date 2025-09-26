@@ -1,0 +1,35 @@
+stages:
+  - build
+  - test
+  - deploy
+
+variables:
+  DOTNET_SDK_VERSION: "6.0"
+
+before_script:
+  - apt-get update -yqq
+  - apt-get install -yqq --no-install-recommends dotnet-sdk-$DOTNET_SDK_VERSION
+
+build:
+  stage: build
+  script:
+    - dotnet restore
+    - dotnet build --configuration Release --no-restore
+  artifacts:
+    paths:
+      - ServerApp/bin/Release/net6.0/publish/
+
+test:
+  stage: test
+  script:
+    - dotnet test --no-restore --verbosity normal
+  coverage: '/\(\d+.\d+\%\) covered/'
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Deploying to staging environment..."
+    - docker build -t watch-assets .
+    - docker run -d -p 8080:80 watch-assets
+  only:
+    - main
