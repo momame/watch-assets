@@ -9,6 +9,7 @@ import { Component } from '@angular/core';
         <ul class="nav-links">
           <li><a routerLink="/assets" routerLinkActive="active">All Assets</a></li>
           <li><a routerLink="/search" routerLinkActive="active">Search Assets</a></li>
+          <li><a routerLink="/dashboard" routerLinkActive="active">Performance</a></li>
         </ul>
       </nav>
       <router-outlet></router-outlet>

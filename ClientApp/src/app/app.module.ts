@@ -9,6 +9,7 @@ import { AssetDetailComponent } from './components/asset-detail/asset-detail.com
 import { AppRoutingModule } from './app-routing.module';
 import { AssetHealthComponent } from './components/asset-health/asset-health.component';
 import { AssetSearchComponent } from './components/asset-search/asset-search.component';
+import { PerformanceDashboardComponent } from './components/performance-dashboard/performance-dashboard.component';
 
 @NgModule({
   declarations: [
@@ -16,7 +17,8 @@ import { AssetSearchComponent } from './components/asset-search/asset-search.com
     AssetListComponent,
     AssetDetailComponent,
     AssetHealthComponent,
-    AssetSearchComponent
+    AssetSearchComponent,
+    PerformanceDashboardComponent
   ],
   imports: [
     BrowserModule,

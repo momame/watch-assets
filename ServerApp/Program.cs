@@ -1,4 +1,3 @@
-using Amazon.S3;
 using Microsoft.EntityFrameworkCore;
 using watch_assets.Data;
 using watch_assets.Middleware;
@@ -13,14 +12,8 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<WatchAssetsContext>(options =>
     options.UseInMemoryDatabase("WatchAssetsDb"));
 
-// TODO: Move AWS configuration to environment variables
-// TODO: Add proper logging configuration
-// TODO: Consider using a proper database instead of in-memory for production
-
-// Add AWS S3 Service
-builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
-builder.Services.AddAWSService<IAmazonS3>();
-builder.Services.AddScoped<IAwsService, AwsService>();
+// Add Azure Blob Storage Service
+builder.Services.AddScoped<IAzureService, AzureService>();
 
 // Add logging
 builder.Services.AddLogging();
