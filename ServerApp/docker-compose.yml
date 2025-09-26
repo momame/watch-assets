@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  watch-assets-api:
+    build: .
+    ports:
+      - "8080:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - AWS__BucketName=watch-assets-bucket
+    depends_on:
+      - postgres
+    networks:
+      - watch-assets-network
+
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: watchassetsdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - watch-assets-network
+
+networks:
+  watch-assets-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
