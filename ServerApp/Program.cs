@@ -13,6 +13,10 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<WatchAssetsContext>(options =>
     options.UseInMemoryDatabase("WatchAssetsDb"));
 
+// TODO: Move AWS configuration to environment variables
+// TODO: Add proper logging configuration
+// TODO: Consider using a proper database instead of in-memory for production
+
 // Add AWS S3 Service
 builder.Services.AddDefaultAWSOptions(builder.Configuration.GetAWSOptions());
 builder.Services.AddAWSService<IAmazonS3>();

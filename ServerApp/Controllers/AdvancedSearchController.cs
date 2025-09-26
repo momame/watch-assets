@@ -20,7 +20,8 @@ namespace watch_assets.Controllers
         [HttpPost("semantic-search")]
         public async Task<ActionResult<IEnumerable<Asset>>> SemanticSearch([FromBody] AssetSearch searchParams)
         {
-            // Simulate semantic search with scoring
+            // TODO: Replace with actual ML model for semantic search
+            // For now using basic keyword matching with scoring
             var assets = await _context.Assets.ToListAsync();
             
             var scoredAssets = assets
@@ -29,10 +30,11 @@ namespace watch_assets.Controllers
                     Asset = asset,
                     Score = CalculateRelevanceScore(asset, searchParams)
                 })
-                .Where(x => x.Score > 0.3) // Threshold for relevance
+                .Where(x => x.Score > 0.3) // Threshold for relevance - might need tuning based on data
                 .OrderByDescending(x => x.Score)
                 .Select(x => x.Asset);
 
+            // Note: In production, we'd want to cache these results for performance
             return Ok(scoredAssets);
         }
 
