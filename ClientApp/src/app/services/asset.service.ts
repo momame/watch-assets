@@ -37,6 +37,12 @@ export class AssetService {
       .pipe(catchError(this.handleError));
   }
 
+  semanticSearch(criteria: AssetSearchCriteria): Observable<Asset[]> {
+    // New semantic search functionality
+    return this.http.post<Asset[]>(`${this.apiUrl}/advancedsearch/semantic-search`, criteria)
+      .pipe(catchError(this.handleError));
+  }
+
   // Error handling - need to improve this
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'Unknown error!';

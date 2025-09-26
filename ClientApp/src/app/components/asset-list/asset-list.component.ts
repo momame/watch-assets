@@ -1,4 +1,3 @@
- 
 import { Component, OnInit } from '@angular/core';
 import { Asset } from '../../models/asset.model';
 import { AssetService } from '../../services/asset.service';
@@ -7,6 +6,16 @@ import { AssetService } from '../../services/asset.service';
   selector: 'app-asset-list',
   template: `
     <h2>Asset List</h2>
+    <div class="controls">
+      <input 
+        type="text" 
+        [(ngModel)]="searchQuery" 
+        placeholder="Quick search..." 
+        (keyup.enter)="quickSearch()"
+        class="search-input"
+      >
+      <button (click)="quickSearch()" class="search-button">Quick Search</button>
+    </div>
     <div class="asset-grid">
       <div *ngFor="let asset of assets" class="asset-card">
         <h3>{{ asset.assetName }}</h3>
@@ -23,6 +32,24 @@ import { AssetService } from '../../services/asset.service';
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: 20px;
       margin-top: 20px;
+    }
+    .controls {
+      margin-bottom: 20px;
+    }
+    .search-input {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 200px;
+    }
+    .search-button {
+      margin-left: 10px;
+      background-color: #007acc;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
     }
     .asset-card {
       border: 1px solid #ddd;
@@ -45,6 +72,7 @@ import { AssetService } from '../../services/asset.service';
 })
 export class AssetListComponent implements OnInit {
   assets: Asset[] = [];
+  searchQuery: string = '';
 
   constructor(private assetService: AssetService) { }
 
@@ -58,6 +86,20 @@ export class AssetListComponent implements OnInit {
         this.assets = data;
       }
     );
+  }
+
+  quickSearch(): void {
+    if (this.searchQuery.trim()) {
+      // Use semantic search for quick search
+      this.assetService.semanticSearch({ query: this.searchQuery }).subscribe(
+        (results) => {
+          this.assets = results;
+        }
+      );
+    } else {
+      // Load all assets if search is empty
+      this.loadAssets();
+    }
   }
 
   getStatusClass(status: string): string {

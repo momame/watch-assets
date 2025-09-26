@@ -25,6 +25,14 @@ import { Asset } from '../../models/asset.model';
           <option value="Operational">Operational</option>
           <option value="Maintenance">Maintenance</option>
         </select>
+        <div class="search-type">
+          <label>
+            <input type="radio" [(ngModel)]="searchType" value="basic"> Basic
+          </label>
+          <label>
+            <input type="radio" [(ngModel)]="searchType" value="semantic"> Semantic
+          </label>
+        </div>
         <button (click)="performSearch()" class="search-button">Search</button>
       </div>
       
@@ -48,6 +56,7 @@ import { Asset } from '../../models/asset.model';
       gap: 10px;
       margin-bottom: 20px;
       flex-wrap: wrap;
+      align-items: center;
     }
     .search-input, .filter-select {
       padding: 8px;
@@ -57,6 +66,10 @@ import { Asset } from '../../models/asset.model';
     .search-input {
       flex: 1;
       min-width: 200px;
+    }
+    .search-type {
+      display: flex;
+      gap: 10px;
     }
     .search-button {
       background-color: #007acc;
@@ -85,6 +98,7 @@ export class AssetSearchComponent {
   searchQuery: string = '';
   locationFilter: string = '';
   statusFilter: string = '';
+  searchType: 'basic' | 'semantic' = 'basic';
   searchResults: Asset[] = [];
 
   constructor(private assetService: AssetService) { }
@@ -96,11 +110,21 @@ export class AssetSearchComponent {
       status: this.statusFilter
     };
 
-    this.assetService.searchAssets(searchParams).subscribe(
-      (results) => {
-        this.searchResults = results;
-      }
-    );
+    if (this.searchType === 'semantic') {
+      // Use semantic search algorithm
+      this.assetService.semanticSearch(searchParams).subscribe(
+        (results) => {
+          this.searchResults = results;
+        }
+      );
+    } else {
+      // Use basic search
+      this.assetService.searchAssets(searchParams).subscribe(
+        (results) => {
+          this.searchResults = results;
+        }
+      );
+    }
   }
 
   getStatusClass(status: string): string {
